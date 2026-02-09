@@ -23,7 +23,7 @@ A simple, elegant web-based music streaming system for Raspberry Pi. Control you
 
 ```bash
 # Download the project
-git clone https://github.com/YOUR-USERNAME/pi-music-player.git
+git clone [https://github.com/lordhaon/pi-music-player]
 cd pi-music-player
 
 # Run the installer
