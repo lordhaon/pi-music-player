@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Stream Player - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .player {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+        }
+        
+        .setup-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+        
+        .header-with-gear {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .gear-icon {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        
+        .gear-icon:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+        
+        .stream-name {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .status-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.secondary {
+            background: #95a5f5;
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+        
+        button.secondary:hover {
+            background: #7d8fe8;
+        }
+        
+        button.full-width {
+            display: block;
+            width: 100%;
+        }
+        
+        .volume-control {
+            margin-top: 20px;
+        }
+        
+        .volume-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .message {
+            text-align: center;
+            color: #666;
+            margin-top: 20px;
+            font-size: 12px;
+            min-height: 18px;
+        }
+        
+        .error {
+            color: #d32f2f;
+            font-weight: 600;
+        }
+        
+        .success {
+            color: #388e3c;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .config-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .config-buttons button {
+            flex: 1;
+        }
+        
+        .setup-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #1976d2;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+        
+        .close-btn {
+            background: none;
+            color: #999;
+            font-size: 28px;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            line-height: 1;
+        }
+        
+        .close-btn:hover {
+            background: none;
+            color: #333;
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Initial Setup Screen -->
+    <div id="setupScreen" class="setup-container hidden">
+        <h2>🎵 First Time Setup</h2>
+        
+        <div class="setup-info">
+            Welcome! Let's set up your music player. Create a password to secure your settings.
+        </div>
+        
+        <form id="setupForm" onsubmit="return completeSetup(event)">
+            <div class="form-group">
+                <label>Location Name</label>
+                <input type="text" id="setupLocation" placeholder="e.g., Living Room" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Stream URL</label>
+                <input type="text" id="setupStreamUrl" placeholder="http://stream.example.com:8000/stream" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Create Password</label>
+                <input type="password" id="setupPassword" placeholder="Enter password" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="setupPasswordConfirm" placeholder="Confirm password" required>
+            </div>
+            
+            <button type="submit" class="full-width">Complete Setup</button>
+            
+            <div class="message" id="setupMessage"></div>
+        </form>
+    </div>
+    
+    <!-- Main Player Screen -->
+    <div id="playerScreen" class="player hidden">
+        <div class="header-with-gear">
+            <h1 id="locationName">🎵 Music Player</h1>
+            <button class="gear-icon" onclick="showConfigModal()" title="Settings">⚙️</button>
+        </div>
+        <div class="stream-name">Raspberry Pi Audio System</div>
+        
+        <div class="status">
+            <div class="status-text" id="status">⏹ Stopped</div>
+        </div>
+        
+        <div class="controls">
+            <button onclick="play()">▶ Play</button>
+            <button onclick="stop()">⏹ Stop</button>
+        </div>
+        
+        <div class="volume-control">
+            <div class="volume-label">
+                <span>Volume</span>
+                <span id="volumeValue">70%</span>
+            </div>
+            <input type="range" id="volumeSlider" min="0" max="100" value="70" oninput="updateVolume(this.value)">
+        </div>
+        
+        <div class="message" id="message"></div>
+    </div>
+    
+    <!-- Configuration Modal -->
+    <div id="configModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ Settings</h2>
+                <button class="close-btn" onclick="closeConfigModal()">×</button>
+            </div>
+            
+            <form id="configForm" onsubmit="return saveConfig(event)">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="configCurrentPassword" placeholder="Enter current password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Location Name</label>
+                    <input type="text" id="configLocation" placeholder="e.g., Living Room" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Stream URL</label>
+                    <input type="text" id="configStreamUrl" placeholder="http://stream.example.com:8000/stream" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>New Password (leave blank to keep current)</label>
+                    <input type="password" id="configNewPassword" placeholder="New password (optional)">
+                </div>
+                
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="configNewPasswordConfirm" placeholder="Confirm new password">
+                </div>
+                
+                <div class="config-buttons">
+                    <button type="button" class="secondary" onclick="closeConfigModal()">Cancel</button>
+                    <button type="submit">Save Changes</button>
+                </div>
+                
+                <div class="message" id="configMessage"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let hasPassword = false;
+        
+        // Check authentication status on load
+        window.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+        });
+        
+        async function checkAuth() {
+            try {
+                const response = await fetch('control.php?cmd=check_auth');
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        // Backend not found - show setup anyway for demo purposes
+                        console.warn('Backend not found (404) - showing setup screen');
+                        showScreen('setup');
+                        return;
+                    }
+                    throw new Error('HTTP ' + response.status);
+                }
+                
+                const text = await response.text();
+                let data;
+                
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    console.error('Invalid JSON response:', text);
+                    // Assume first setup needed
+                    showScreen('setup');
+                    return;
+                }
+                
+                if (data.needs_setup) {
+                    showScreen('setup');
+                } else {
+                    hasPassword = true;
+                    await loadConfig();
+                    showScreen('player');
+                    updateStatus();
+                    setInterval(updateStatus, 3000);
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                // If check fails, show setup screen
+                showScreen('setup');
+                // Show helpful message
+                setTimeout(() => {
+                    const msg = document.getElementById('setupMessage');
+                    if (msg) {
+                        msg.className = 'message error';
+                        msg.textContent = 'Note: Backend not detected. Make sure control.php is in the same directory as index.html on your Raspberry Pi.';
+                    }
+                }, 500);
+            }
+        }
+        
+        function showScreen(screen) {
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('playerScreen').classList.add('hidden');
+            
+            if (screen === 'setup') {
+                document.getElementById('setupScreen').classList.remove('hidden');
+            } else if (screen === 'player') {
+                document.getElementById('playerScreen').classList.remove('hidden');
+            }
+        }
+        
+        // Setup Form Handler
+        async function completeSetup(e) {
+            e.preventDefault();
+            
+            const location = document.getElementById('setupLocation').value;
+            const streamUrl = document.getElementById('setupStreamUrl').value;
+            const password = document.getElementById('setupPassword').value;
+            const passwordConfirm = document.getElementById('setupPasswordConfirm').value;
+            
+            if (password !== passwordConfirm) {
+                showMessage('setupMessage', 'Passwords do not match', 'error');
+                return false;
+            }
+            
+            if (password.length < 4) {
+                showMessage('setupMessage', 'Password must be at least 4 characters', 'error');
+                return false;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('location', location);
+                formData.append('stream_url', streamUrl);
+                formData.append('password', password);
+                
+                const response = await fetch('control.php?cmd=initial_setup', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    hasPassword = true;
+                    showMessage('setupMessage', 'Setup complete! Loading...', 'success');
+                    setTimeout(() => {
+                        loadConfig();
+                        showScreen('player');
+                        updateStatus();
+                        setInterval(updateStatus, 3000);
+                    }, 1000);
+                } else {
+                    showMessage('setupMessage', data.error || 'Setup failed', 'error');
+                }
+            } catch (error) {
+                showMessage('setupMessage', 'Error: ' + error.message, 'error');
+            }
+            
+            return false;
+        }
+        
+        // Config Form Handler
+        async function saveConfig(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('configCurrentPassword').value;
+            const location = document.getElementById('configLocation').value;
+            const streamUrl = document.getElementById('configStreamUrl').value;
+            const newPassword = document.getElementById('configNewPassword').value;
+            const newPasswordConfirm = document.getElementById('configNewPasswordConfirm').value;
+            
+            if (newPassword && newPassword !== newPasswordConfirm) {
+                showMessage('configMessage', 'New passwords do not match', 'error');
+                return false;
+            }
+            
+            if (newPassword && newPassword.length < 4) {
+                showMessage('configMessage', 'New password must be at least 4 characters', 'error');
+                return false;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('current_password', currentPassword);
+                formData.append('location', location);
+                formData.append('stream_url', streamUrl);
+                if (newPassword) {
+                    formData.append('new_password', newPassword);
+                }
+                
+                const response = await fetch('control.php?cmd=update_config', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('configMessage', 'Settings saved!', 'success');
+                    await loadConfig();
+                    setTimeout(() => {
+                        closeConfigModal();
+                        updateStatus();
+                    }, 1000);
+                } else {
+                    showMessage('configMessage', data.error || 'Failed to save', 'error');
+                }
+            } catch (error) {
+                showMessage('configMessage', 'Error: ' + error.message, 'error');
+            }
+            
+            return false;
+        }
+        
+        async function loadConfig() {
+            try {
+                const response = await fetch('control.php?cmd=get_config');
+                const config = await response.json();
+                
+                if (config.location_name) {
+                    document.getElementById('locationName').textContent = '🎵 ' + config.location_name;
+                }
+            } catch (error) {
+                console.error('Failed to load config:', error);
+            }
+        }
+        
+        function showConfigModal() {
+            // Load current settings
+            fetch('control.php?cmd=get_config')
+            .then(r => r.json())
+            .then(config => {
+                document.getElementById('configLocation').value = config.location_name || '';
+                document.getElementById('configStreamUrl').value = config.stream_url || '';
+            });
+            
+            document.getElementById('configCurrentPassword').value = '';
+            document.getElementById('configNewPassword').value = '';
+            document.getElementById('configNewPasswordConfirm').value = '';
+            document.getElementById('configMessage').textContent = '';
+            
+            document.getElementById('configModal').classList.remove('hidden');
+        }
+        
+        function closeConfigModal() {
+            document.getElementById('configModal').classList.add('hidden');
+        }
+        
+        function showMessage(elementId, text, type = '') {
+            const element = document.getElementById(elementId);
+            element.textContent = text;
+            element.className = 'message';
+            if (type) {
+                element.classList.add(type);
+            }
+        }
+        
+        async function runCommand(cmd, data = null) {
+            try {
+                const options = {
+                    method: data ? 'POST' : 'GET'
+                };
+                
+                if (data) {
+                    const formData = new FormData();
+                    for (const key in data) {
+                        formData.append(key, data[key]);
+                    }
+                    options.body = formData;
+                }
+                
+                const url = 'control.php?cmd=' + encodeURIComponent(cmd);
+                const response = await fetch(url, options);
+                const text = await response.text();
+                return text;
+            } catch (error) {
+                document.getElementById('message').textContent = 'Error: ' + error.message;
+                return '';
+            }
+        }
+        
+        async function play() {
+            await runCommand('play');
+            document.getElementById('message').textContent = 'Playing...';
+            setTimeout(updateStatus, 500);
+        }
+        
+        async function stop() {
+            await runCommand('stop');
+            document.getElementById('message').textContent = 'Stopped';
+            setTimeout(updateStatus, 500);
+        }
+        
+        async function updateVolume(value) {
+            document.getElementById('volumeValue').textContent = value + '%';
+            await runCommand('volume ' + value);
+        }
+        
+        async function updateStatus() {
+            const status = await runCommand('status');
+            if (status.includes('playing')) {
+                document.getElementById('status').textContent = '▶ Playing';
+            } else if (status.includes('paused')) {
+                document.getElementById('status').textContent = '⏸ Paused';
+            } else {
+                document.getElementById('status').textContent = '⏹ Stopped';
+            }
+            
+            const volumeMatch = status.match(/volume:\s*(\d+)%/);
+            if (volumeMatch) {
+                const vol = volumeMatch[1];
+                document.getElementById('volumeSlider').value = vol;
+                document.getElementById('volumeValue').textContent = vol + '%';
+            }
+        }
+    </script>
+</body>
+</html>
